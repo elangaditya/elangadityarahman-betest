@@ -1,19 +1,27 @@
-import { Schema, model } from "mongoose";
+import Joi from "joi";
+import { Schema, model, mongo } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 export interface IUser {
-  id?: string;
+  _id?: string;
   userName: string;
   accountNumber: number;
   emailAddress: string;
   identityNumber: number;
 }
 
+export interface IUserUpdate {
+  userName?: string;
+  accountNumber?: string;
+  emailAddress?: string;
+  identityNumber?: string;
+}
+
 export const userSchema = new Schema<IUser>({
-  id: {
+  _id: {
     type: String,
     default: () => {
-      return uuidv4();
+      return new mongo.ObjectId()
     },
     required: true,
   },
@@ -24,3 +32,17 @@ export const userSchema = new Schema<IUser>({
 });
 
 export const User = model("User", userSchema);
+
+export const createUserSchema = Joi.object({
+  userName: Joi.string().alphanum().required(),
+  accountNumber: Joi.number().integer().required(),
+  emailAddress: Joi.string().email().required(),
+  identityNumber: Joi.number().integer().required(),
+}).strict();
+
+export const updateUserSchema = Joi.object({
+  userName: Joi.string().alphanum(),
+  accountNumber: Joi.number().integer(),
+  emailAddress: Joi.string().email(),
+  identityNumber: Joi.number().integer(),
+}).strict();
