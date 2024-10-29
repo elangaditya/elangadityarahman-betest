@@ -1,5 +1,5 @@
 import { IUser, User } from "../db/models";
-import { UniqueValueError } from "../errors/db";
+import { NotFoundError, UniqueValueError } from "../errors";
 
 export class AuthService {
   static async signup(userData: IUser) {
@@ -21,6 +21,32 @@ export class AuthService {
 
     if (!user) {
       throw new Error("Unable to create user");
+    }
+
+    return user;
+  }
+
+  static async getUsers() {
+    const users = await User.find({});
+
+    return users;
+  }
+
+  static async findUser(accountNumber: number, identityNumber: number) {
+    const queryParams: any = {};
+
+    if (accountNumber) {
+      queryParams.accountNumber = accountNumber;
+    }
+
+    if (identityNumber) {
+      queryParams.identityNumber = identityNumber;
+    }
+
+    const user = await User.findOne(queryParams);
+
+    if (!user) {
+      throw new NotFoundError("user not found", queryParams);
     }
 
     return user;
