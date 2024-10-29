@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { AuthService } from "../services";
+import { UserService } from "../services";
 import { NotFoundError } from "../errors";
 import { createUserSchema, updateUserSchema } from "../db/models";
 
-export class AuthController {
+export class UserController {
   static async create(req: Request, res: Response) {
     const userData = req.body;
 
@@ -16,7 +16,7 @@ export class AuthController {
       return;
     }
 
-    const user = await AuthService.signup(userData).catch((err) => {
+    const user = await UserService.signup(userData).catch((err) => {
       return res
         .status(400)
         .send({ err: true, name: err.name, message: err.message });
@@ -26,7 +26,7 @@ export class AuthController {
   }
 
   static async getUsers(req: Request, res: Response) {
-    const users = await AuthService.getUsers().catch((err) => {
+    const users = await UserService.getUsers().catch((err) => {
       res.status(400).send({ err: true, message: err.message });
     });
 
@@ -41,7 +41,7 @@ export class AuthController {
       ? parseInt(req.query.identityNumber as string)
       : -1;
 
-    const user = await AuthService.findUser(
+    const user = await UserService.findUser(
       accountNumber,
       identityNumber,
     ).catch((err) => {
@@ -67,7 +67,7 @@ export class AuthController {
         .send({ err: true, name: error.name, message: error.message });
     }
 
-    const updatedUser = await AuthService.updateUser(userId, userData).catch(
+    const updatedUser = await UserService.updateUser(userId, userData).catch(
       (err) => {
         return res
           .status(400)

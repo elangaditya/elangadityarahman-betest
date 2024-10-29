@@ -1,7 +1,7 @@
 import { IUser, User } from "../db/models";
 import { NotFoundError, UniqueValueError } from "../errors";
 
-export class AuthService {
+export class UserService {
   static async signup(userData: IUser) {
     const users = await User.find({
       $or: [

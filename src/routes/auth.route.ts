@@ -1,11 +1,11 @@
 import express from "express";
-import { AuthController } from "../controller";
+import { UserController } from "../controller";
 
 const router = express.Router();
 
-router.get("/", AuthController.getUsers);
-router.post("/create", AuthController.create);
-router.get("/find", AuthController.findUser);
-router.post("/:userId", AuthController.updateUser);
+router.get("/", UserController.getUsers);
+router.post("/create", UserController.create);
+router.get("/find", UserController.findUser);
+router.post("/:userId", UserController.updateUser);
 
 export default router;
