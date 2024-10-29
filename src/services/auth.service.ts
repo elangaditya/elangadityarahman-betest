@@ -83,5 +83,7 @@ export class UserService {
     User.deleteOne({ _id: id }).catch((err) => {
       throw err;
     });
+
+    return id;
   }
 }

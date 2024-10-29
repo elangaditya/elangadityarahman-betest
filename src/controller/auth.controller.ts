@@ -8,7 +8,6 @@ export class UserController {
     const userData = req.body;
 
     const { error } = createUserSchema.validate(userData);
-    console.log("error: ", error);
     if (error) {
       res
         .status(400)
@@ -16,21 +15,25 @@ export class UserController {
       return;
     }
 
-    const user = await UserService.signup(userData).catch((err) => {
-      return res
-        .status(400)
-        .send({ err: true, name: err.name, message: err.message });
-    });
-
-    return res.status(201).send(user);
+    await UserService.signup(userData)
+      .then((user) => {
+        return res.status(201).send(user);
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ err: true, name: err.name, message: err.message });
+      });
   }
 
   static async getUsers(req: Request, res: Response) {
-    const users = await UserService.getUsers().catch((err) => {
-      res.status(400).send({ err: true, message: err.message });
-    });
-
-    return res.status(200).send({ err: false, users });
+    await UserService.getUsers()
+      .then((users) => {
+        return res.status(200).send({ err: false, users });
+      })
+      .catch((err) => {
+        res.status(400).send({ err: true, message: err.message });
+      });
   }
 
   static async findUser(req: Request, res: Response) {
@@ -41,20 +44,22 @@ export class UserController {
       ? parseInt(req.query.identityNumber as string)
       : -1;
 
-    const user = await UserService.findUser(
-      accountNumber,
-      identityNumber,
-    ).catch((err) => {
-      if (err instanceof NotFoundError) {
-        return res
-          .status(404)
-          .send({ err: true, message: err.message, query: err.query });
-      }
+    await UserService.findUser(accountNumber, identityNumber)
+      .then((user) => {
+        return res.status(200).send({ err: false, user });
+      })
+      .catch((err) => {
+        if (err instanceof NotFoundError) {
+          return res.status(404).send({
+            err: true,
+            name: err.name,
+            message: err.message,
+            query: err.query,
+          });
+        }
 
-      return res.status(400).send({ err: true, message: err.message });
-    });
-
-    return res.status(200).send({ err: false, user });
+        return res.status(400).send({ err: true, message: err.message });
+      });
   }
 
   static async updateUser(req: Request, res: Response) {
@@ -67,15 +72,33 @@ export class UserController {
         .send({ err: true, name: error.name, message: error.message });
     }
 
-    const updatedUser = await UserService.updateUser(userId, userData).catch(
-      (err) => {
+    await UserService.updateUser(userId, userData)
+      .then((updatedUser) => {
+        return res.status(200).send({ err: false, updatedUser });
+      })
+      .catch((err) => {
         return res
           .status(400)
           .send({ err: true, name: err.name, message: err.message });
-      },
-    );
+      });
+  }
 
-    console.log("update ", updatedUser);
-    return res.status(200).send({ err: false, updatedUser });
+  static async deleteUser(req: Request, res: Response) {
+    const { userId } = req.params;
+
+    await UserService.deleteUser(userId)
+      .then((id) => {
+        return res.status(200).send({ err: false, deletedId: id });
+      })
+      .catch((err) => {
+        if (err instanceof NotFoundError) {
+          return res.status(404).send({
+            err: true,
+            name: err.name,
+            message: err.message,
+            query: err.query,
+          });
+        }
+      });
   }
 }
