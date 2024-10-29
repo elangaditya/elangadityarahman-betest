@@ -1,7 +1,8 @@
 import { IUser, User } from "../db/models";
+import { UniqueValueError } from "../errors/db";
 
 export class AuthService {
-  static async singup(userData: IUser) {
+  static async signup(userData: IUser) {
     const users = await User.find({
       $or: [
         { userName: userData.userName },
@@ -9,22 +10,19 @@ export class AuthService {
       ],
     });
 
-    console.log(users);
-
-    if (users) {
-      throw new Error(
+    if (users[0]) {
+      throw new UniqueValueError(
         "User credentials already exist (userName and/or emailAdress)",
       );
     }
 
     const newUser = new User(userData);
-    newUser
-      .save()
-      .then((user) => {
-        return user;
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
+    const user = await newUser.save();
+
+    if (!user) {
+      throw new Error("Unable to create user");
+    }
+
+    return user;
   }
 }
