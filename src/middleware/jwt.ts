@@ -8,7 +8,7 @@ export function generateAccessToken() {
   const payload: any = {
     date: new Date(),
   };
-  return jwt.sign(payload, process.env.TOKEN_SECRET as string, { expiresIn: 600 });
+  return jwt.sign(payload, process.env.TOKEN_SECRET as string, { expiresIn: 3600 });
 }
 
 export function authenticateToken(
