@@ -18,7 +18,7 @@ export class UserController {
 
     await UserService.createUser(userData)
       .then((user) => {
-        return res.status(201).send(user);
+        return res.status(201).send({ err: false, user });
       })
       .catch((err) => {
         return res
