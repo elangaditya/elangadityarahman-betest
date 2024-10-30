@@ -13,7 +13,7 @@ connectDb();
 redisClient.connect();
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send("Code.ID Backend Test Server");
 });
 
 app.use(bodyParser.json());
