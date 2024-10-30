@@ -130,6 +130,9 @@ export class UserService {
       throw err;
     });
 
+    await redisClient.del(`accountNumber/${user.accountNumber}`)
+    await redisClient.del(`identityNumber/${user.identityNumber}`)
+
     return id;
   }
 }
