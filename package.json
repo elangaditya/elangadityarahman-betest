@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./app.ts",
-    "build": "tsc"
+    "dev": "nodemon ./src/index.ts",
+    "build": "rimraf ./dist && tsc",
+    "start": "npm run build && node dist/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
     "redis": "^4.7.0",
+    "rimraf": "^6.0.1",
     "uuid": "^11.0.2"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import routes from "./src/routes";
+import routes from "./routes";
 import bodyParser from "body-parser";
-import { connectDb, redisClient } from "./src/db";
+import { connectDb, redisClient } from "./db";
 
 dotenv.config();
 
