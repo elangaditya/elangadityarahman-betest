@@ -1,3 +1,4 @@
+import { redisClient } from "../db";
 import { IUser, User } from "../db/models";
 import { NotFoundError, UniqueValueError } from "../errors";
 
@@ -33,6 +34,8 @@ export class UserService {
   }
 
   static async findUserByAccountNumber(accountNumber: number) {
+    const redisString = `accountNumber/${accountNumber}`;
+
     const queryParams: any = {
       accountNumber,
     };
@@ -43,10 +46,14 @@ export class UserService {
       throw new NotFoundError("user not found", queryParams);
     }
 
+    const returnData = await redisClient.set(redisString, JSON.stringify(user));
+    console.log(returnData);
     return user;
   }
 
   static async findUserByIdentityNumber(identityNumber: number) {
+    const redisString = `identityNumber/${identityNumber}`;
+
     const queryParams: any = {
       identityNumber,
     };
@@ -56,7 +63,8 @@ export class UserService {
     if (!user) {
       throw new NotFoundError("user not found", queryParams);
     }
-
+    const returnData = await redisClient.set(redisString, JSON.stringify(user));
+    console.log(returnData);
     return user;
   }
 
@@ -88,7 +96,15 @@ export class UserService {
       throw new NotFoundError("user not found", { _id: id });
     }
 
+    const cacheInvalidate: string[] = [];
+
     for (const [key, value] of Object.entries(userData)) {
+      if (key == "accountNumber") {
+        cacheInvalidate.push(`accountNumber/${user.accountNumber}`);
+      }
+      if (key == "identityNumber") {
+        cacheInvalidate.push(`identityNumber/${user.identityNumber}`);
+      }
       user.set(key, value);
     }
 
@@ -96,7 +112,9 @@ export class UserService {
       throw err;
     });
 
-    console.log(user);
+    for (let i = 0; i < cacheInvalidate.length; i++) {
+      await redisClient.del(cacheInvalidate[i]);
+    }
 
     return user;
   }

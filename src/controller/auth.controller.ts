@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { UserService } from "../services";
 import { NotFoundError } from "../errors";
 import { createUserSchema, updateUserSchema } from "../db/models";
-import Joi from "joi";
+import { redisClient } from "../db";
 
 export class UserController {
   static async create(req: Request, res: Response) {
@@ -47,6 +47,16 @@ export class UserController {
         .send(400)
         .send({ err: true, message: "Invalid identity number" });
     }
+
+    const redisString = `identityNumber/${identityNumber}`;
+
+    const data = await redisClient.get(redisString);
+    if (data) {
+      return res
+        .status(200)
+        .send({ err: false, user: JSON.parse(data), cached: true });
+    }
+
     await UserService.findUserByIdentityNumber(query)
       .then((user) => {
         return res.status(200).send({ err: false, user });
@@ -74,6 +84,15 @@ export class UserController {
       return res
         .send(400)
         .send({ err: true, message: "Invalid account number" });
+    }
+
+    const redisString = `accountNumber/${accountNumber}`;
+
+    const data = await redisClient.get(redisString);
+    if (data) {
+      return res
+        .status(200)
+        .send({ err: false, user: JSON.parse(data), cached: true });
     }
     await UserService.findUserByAccountNumber(query)
       .then((user) => {

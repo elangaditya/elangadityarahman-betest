@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import routes from "./src/routes";
 import bodyParser from "body-parser";
-import { connectDb } from "./src/db";
+import { connectDb, redisClient } from "./src/db";
 
 dotenv.config();
 
@@ -10,6 +10,7 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 connectDb();
+redisClient.connect();
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
