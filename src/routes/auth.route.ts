@@ -14,7 +14,7 @@ router.get(
   "/find/identityNumber/:identityNumber",
   UserController.findUserByIdentityNumber,
 );
-router.post("/:userId", UserController.updateUser);
+router.patch("/:userId", UserController.updateUser);
 router.delete("/:userId", UserController.deleteUser);
 
 export default router;
