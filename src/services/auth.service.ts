@@ -2,7 +2,7 @@ import { IUser, User } from "../db/models";
 import { NotFoundError, UniqueValueError } from "../errors";
 
 export class UserService {
-  static async signup(userData: IUser) {
+  static async createUser(userData: IUser) {
     const users = await User.find({
       $or: [
         { userName: userData.userName },
@@ -30,6 +30,34 @@ export class UserService {
     const users = await User.find({});
 
     return users;
+  }
+
+  static async findUserByAccountNumber(accountNumber: number) {
+    const queryParams: any = {
+      accountNumber,
+    };
+
+    const user = await User.findOne(queryParams);
+
+    if (!user) {
+      throw new NotFoundError("user not found", queryParams);
+    }
+
+    return user;
+  }
+
+  static async findUserByIdentityNumber(identityNumber: number) {
+    const queryParams: any = {
+      identityNumber,
+    };
+
+    const user = await User.findOne(queryParams);
+
+    if (!user) {
+      throw new NotFoundError("user not found", queryParams);
+    }
+
+    return user;
   }
 
   static async findUser(accountNumber: number, identityNumber: number) {

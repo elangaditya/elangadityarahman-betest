@@ -21,7 +21,7 @@ export const userSchema = new Schema<IUser>({
   _id: {
     type: String,
     default: () => {
-      return new mongo.ObjectId()
+      return new mongo.ObjectId();
     },
     required: true,
   },
@@ -30,6 +30,8 @@ export const userSchema = new Schema<IUser>({
   emailAddress: { type: String, required: true },
   identityNumber: { type: Number, required: true },
 });
+
+userSchema.index({ accountNumber: 1, identityNumber: 1 }, { unique: true });
 
 export const User = model("User", userSchema);
 

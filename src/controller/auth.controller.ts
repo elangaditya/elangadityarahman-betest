@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserService } from "../services";
 import { NotFoundError } from "../errors";
 import { createUserSchema, updateUserSchema } from "../db/models";
+import Joi from "joi";
 
 export class UserController {
   static async create(req: Request, res: Response) {
@@ -15,7 +16,7 @@ export class UserController {
       return;
     }
 
-    await UserService.signup(userData)
+    await UserService.createUser(userData)
       .then((user) => {
         return res.status(201).send(user);
       })
@@ -33,6 +34,62 @@ export class UserController {
       })
       .catch((err) => {
         res.status(400).send({ err: true, message: err.message });
+      });
+  }
+
+  static async findUserByIdentityNumber(req: Request, res: Response) {
+    const { identityNumber } = req.params;
+
+    const query = parseInt(identityNumber, 10);
+
+    if (!query) {
+      return res
+        .send(400)
+        .send({ err: true, message: "Invalid identity number" });
+    }
+    await UserService.findUserByIdentityNumber(query)
+      .then((user) => {
+        return res.status(200).send({ err: false, user });
+      })
+      .catch((err) => {
+        if (err instanceof NotFoundError) {
+          return res.status(404).send({
+            err: true,
+            name: err.name,
+            message: err.message,
+            query: err.query,
+          });
+        }
+
+        return res.status(400).send({ err: true, message: err.message });
+      });
+  }
+
+  static async findUserByAccountNumber(req: Request, res: Response) {
+    const { accountNumber } = req.params;
+
+    const query = parseInt(accountNumber, 10);
+
+    if (!query) {
+      return res
+        .send(400)
+        .send({ err: true, message: "Invalid account number" });
+    }
+    await UserService.findUserByAccountNumber(query)
+      .then((user) => {
+        return res.status(200).send({ err: false, user });
+      })
+      .catch((err) => {
+        if (err instanceof NotFoundError) {
+          return res.status(404).send({
+            err: true,
+            name: err.name,
+            message: err.message,
+            query: err.query,
+          });
+        }
+
+        return res.status(400).send({ err: true, message: err.message });
       });
   }
 
