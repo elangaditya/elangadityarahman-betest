@@ -1,6 +1,5 @@
 import Joi from "joi";
 import { Schema, model, mongo } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
 
 export interface IUser {
   _id?: string;
